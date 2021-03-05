@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Runaway Self-oscillator</title>
+  <style>
+    body {
+      padding: 10px;
+      margin: 20px;
+    }
+  </style>
+  <script type="text/javascript" src="p5.min.js"></script>
+  <script type="text/javascript" src="runaway_self_oscillator.js"></script>
+
+</head>
+
+<body>
+  <main>
+    <h1>Runaway Self-oscillator</h1>
+    
+    <p>
+      <ul>
+        <li>Simplest form of feedback oscillator</li>
+        <li>Drives itself (green) with a delayed version of its own position (blue)</li>
+        <li>Amplitude increases exponentially</li> 
+        <li>Equivalent to negative damping</li>
+        <li>In real life: "The amplitude of the oscillation grows exponentially with time,
+          until it becomes so large that nonlinear effects become relevant 
+          and somehow determine a limiting amplitude." Jenkins, <a href ="https://arxiv.org/abs/1109.6640">Self-oscillation</a>, pg. 8
+         </li>
+      </ul>
+
+    </p>
+    <div id="p5_sketch"></div>
+
+  </main>
+</body>
+
+</html>
