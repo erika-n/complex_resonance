@@ -1,7 +1,7 @@
 
-// Simple harmonic oscillator:
-// Force of spring = constant times spring length
-// Creates a perfect sine wave
+// Runaway self oscillator
+// Feeds back own force at a delay
+// causes runway increase in amplitude
 
 // these determine frequency
 mass = 1; // mass of object
@@ -23,7 +23,13 @@ values = [];
 n_values = 500;
 
 function setup(){
-  let canvas = createCanvas(400, 300);  
+  w = 400;
+  if(window.displayWidth < w){
+    w = 0.8*window.displayWidth; //0.8*window.innerWidth;
+    
+  }
+  h = 3.0*w/4.0;
+  let canvas = createCanvas(w, h);  
   canvas.parent("p5_sketch");
   anchor_y = height/2.0;
   values = [n_values];

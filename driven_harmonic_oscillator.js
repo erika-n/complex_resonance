@@ -1,4 +1,7 @@
 // Driven harmonic oscillator
+// A simple oscillator drives another oscillator
+// Other oscillator syncs to driving oscillator
+// Resonance effect: amplitude highest at same natural frequency
 
 mass1 = 1; // mass of object
 k1 = 0.01;  // spring constant
@@ -25,7 +28,13 @@ values2 = [];
 n_values = 1000;
 
 function setup(){
-  canvas = createCanvas(600, 400);
+  w = 400;
+  if(window.displayWidth < w){
+    w = 0.8*window.displayWidth; //0.8*window.innerWidth;
+    
+  }
+  h = 3.0*w/4.0;
+  let canvas = createCanvas(w, h);  
   canvas.parent('p5_sketch');  
   anchor_y = height/2.0;
   values1 = [n_values];
