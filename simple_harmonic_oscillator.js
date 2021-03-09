@@ -21,7 +21,13 @@ values = [];
 n_values = 500;
 
 function setup(){
-  let canvas = createCanvas(400, 300);  
+  let w = 400;
+  let h = 300;
+  if(window.innerWidth < 400){
+    w = 0.8*window.innerWidth;
+    h = 3.0*w/4.0;
+  }
+  let canvas = createCanvas(w, h);  
   canvas.parent("p5_sketch");
   anchor_y = height/2.0;
   values = [n_values];
