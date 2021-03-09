@@ -21,9 +21,9 @@ values = [];
 n_values = 500;
 
 function setup(){
-  w = 400;
-  if(window.innerWidth < w){
-    w = 0.8*window.innerWidth; //0.8*window.innerWidth;
+  w = 500;
+  if(window.outerWidth < w){
+    w = 0.8*window.outerWidth; //0.8*window.innerWidth;
     
   }
   h = 3.0*w/4.0;
