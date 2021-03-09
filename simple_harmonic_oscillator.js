@@ -21,7 +21,7 @@ values = [];
 n_values = 500;
 
 function setup(){
-  w = 500;
+  w = 400;
   if(window.displayWidth < w){
     w = 0.8*window.displayWidth; //0.8*window.innerWidth;
     
