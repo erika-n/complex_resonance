@@ -106,8 +106,8 @@ function draw(){
   circle(anchor_x, anchor_y - y1 + y2, 16);
   
   // wave
-  wave_x0 = anchor_x + 100;
-  wave_w = width - wave_x0 - 100;
+  wave_x0 = anchor_x + 50;
+  wave_w = width - wave_x0 - 50;
   point_w = wave_w/n_values;
   stroke(255); 
   strokeWeight(3);
@@ -117,7 +117,7 @@ function draw(){
       stroke(osc1_color);
       line(wave_x0 + point_w*i, anchor_y - values1[i], wave_x0 + point_w*(i + 1), anchor_y - values1[i + 1]);   
       stroke(osc2_color);
-      line(wave_x0 + point_w*i, anchor_y - values1[i] + values2[i], wave_x0 + point_w* (i + 1), anchor_y - values1[i + 1] + values2[i]);   
+      line(wave_x0 + point_w*i, anchor_y - values1[i] + values2[i], wave_x0 + point_w* (i + 1), anchor_y - values1[i + 1] + values2[i + 1]);   
     }
     
   }
