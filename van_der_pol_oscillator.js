@@ -57,6 +57,7 @@ function setup(){
   w = 400;
   if(0.75*window.displayWidth < w){
     w = 0.8*window.displayWidth; 
+    
   }
   h = 3.0*w/4.0;
   let canvas = createCanvas(w, h);  
