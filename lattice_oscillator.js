@@ -111,6 +111,8 @@ function setup(){
   createDiv('n phonons');
   nSlider = createSlider(1, 500, 100, 1);
   nSlider.mouseReleased(reset);
+  createDiv('');
+  createA('index.html', 'Return to index');
   reset();
 }
 
