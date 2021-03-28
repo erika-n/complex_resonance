@@ -62,8 +62,6 @@ class Phonon {
 
     updateForceNonlinear(left_obj, right_obj) {
         // FPUT (Fermi Pasta Ulam Tsingou) non-linear oscillator
-        // F1 = -kx1 + k(x2 - x1) = -2kx1 + kx2 = k(-2*x1 + x2)
-        // F2 = -k(x2 - x1) + k(-x2) = -2kx2 + kx1 = k(-2*x2 + x1)
 
         alpha = 0.9;
         this.force = (-2.0 * this.k * this.x + left_obj.k * left_obj.x + right_obj.k * right_obj.x) * (1 + alpha * (left_obj.x - right_obj.x));
@@ -155,7 +153,7 @@ function setup() {
     zetaSlider = createSlider(-20, 1, -10);
     zetaSlider.mouseReleased(reset);
     createDiv('n phonons');
-    nSlider = createSlider(1, 500, 2);
+    nSlider = createSlider(1, 500, 2*3*4 - 1);
     nSlider.mouseReleased(reset);
     createDiv('');
 
