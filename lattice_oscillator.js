@@ -15,11 +15,11 @@ let checkNormal1;
 let checkNormal2;
 let checkNormal3;
 let checkNormal4;
-let checkRandom;
+let checkPluck;
 let checkLinear;
 let linear = true;
 let normalModes = [false, false, false, false];
-let random = false;
+let pluck= false;
 
 
 
@@ -77,19 +77,24 @@ class Phonon {
     draw(init_x, mult_x, y_loc) {
         noStroke()
         //circle(init_x + mult_x*this.x/2.0, y_loc, this.radius);
-        circle(init_x, y_loc + 200 * this.x, this.radius);
+        circle(init_x, y_loc + 0.5*height * this.x, this.radius);
     }
 
 }
 
 function reset() {
-
+    normalModes[0] = checkNormal1.checked();
+    normalModes[1] = checkNormal2.checked();
+    normalModes[2] = checkNormal3.checked();
+    normalModes[3] = checkNormal4.checked();
+    pluck = checkPluck.checked();
+    linear = checkLinear.checked();
 
     let n_objects = int(nSlider.value()) + 2;
 
     objects = [n_objects];
-    let k = PI ** kSlider.value();
-    let zeta = 2.0 ** zetaSlider.value();
+    let k = 0.01*4*kSlider.value();
+    let zeta = 0.01*2*zetaSlider.value();
 
     let radius = int(0.8 * width / n_objects);
     if (radius < 2) {
@@ -106,29 +111,29 @@ function reset() {
         objects[i].x = 0
         for(n = 0; n < normalModes.length; n++){
             if(normalModes[n]){
-                objects[i].x += (1.0/normalModes.length)*sin((n + 1) * PI * i / (n_objects - 1));
+                objects[i].x += (0.5/normalModes.length)*sin((n + 1) * PI * i / (n_objects - 1));
             }
        }
         
     }
-    if(random){
-        rand_i = Math.floor((objects.length - 2)*Math.random()) + 1
-        rand_r = 0.1*radius*Math.random()
-        objects[rand_i].x = rand_r;
+    if(pluck){
+        //initialize with triangle 
+        pluck_i = int(0.5*objects.length);
+        pluck_x = 0.3
+        for(i = 0; i < pluck_i ; i++){
+            objects[i].x = pluck_x*i/objects.length;
+        }
+
+        for(i = 1; i <= objects.length - pluck_i; i++){
+            objects[objects.length - i].x = pluck_x*i/objects.length;
+        }
+
+
     }
 
 
 }
 
-function changedCheckboxEvent() {
-    normalModes[0] = checkNormal1.checked();
-    normalModes[1] = checkNormal2.checked();
-    normalModes[2] = checkNormal3.checked();
-    normalModes[3] = checkNormal4.checked();
-    random = checkRandom.checked();
-    linear = checkLinear.checked();
-    reset();
-}
 
 
 function setup() {
@@ -146,14 +151,14 @@ function setup() {
 
 
 
-    createDiv('spring constant (0 - 8 logarithmic)');
-    kSlider = createSlider(-10, 4, 1);
+    createDiv('spring constant');
+    kSlider = createSlider(0, 100, 50);
     kSlider.mouseReleased(reset);
-    createDiv('damping ratio (zeta, 0 - 2 logarithmic)');
-    zetaSlider = createSlider(-20, 1, -10);
+    createDiv('damping ratio');
+    zetaSlider = createSlider(0, 100, 10);
     zetaSlider.mouseReleased(reset);
     createDiv('n phonons');
-    nSlider = createSlider(1, 500, 2*3*4 - 1);
+    nSlider = createSlider(1,200, 2*3*4*5 - 1);
     nSlider.mouseReleased(reset);
     createDiv('');
 
@@ -162,18 +167,19 @@ function setup() {
     checkNormal2 = createCheckbox('2', false);
     checkNormal3 = createCheckbox('3', false);
     checkNormal4 = createCheckbox('4', false);
-    checkRandom = createCheckbox('random', false);
+    checkPluck = createCheckbox('pluck', true);
     checkLinear = createCheckbox('Linear', true);
-    checkNormal1.changed(changedCheckboxEvent);
-    checkNormal2.changed(changedCheckboxEvent);
-    checkNormal3.changed(changedCheckboxEvent);
-    checkNormal4.changed(changedCheckboxEvent);
-    checkRandom.changed(changedCheckboxEvent);
-    checkLinear.changed(changedCheckboxEvent);
+    checkNormal1.changed(reset);
+    checkNormal2.changed(reset);
+    checkNormal3.changed(reset);
+    checkNormal4.changed(reset);
+    checkPluck.changed(reset);
+    checkLinear.changed(reset);
 
 
 
     createA('index.html', 'Return to index');
+
     reset();
 }
 
@@ -183,7 +189,7 @@ function setup() {
 function draw() {
 
     // update
-    for (j = 0; j < 1; j++) {
+    for (j = 0; j < 20; j++) {
 
         for (i = 1; i < objects.length - 1; i++) {
             left_obj = objects[i - 1];
@@ -209,7 +215,7 @@ function draw() {
 
 
     // draw
-    background(0);
+    background(20);
     x0 = width / 10.0;
     xwidth = width - 2 * x0;
     xinc = xwidth / (objects.length - 1);
