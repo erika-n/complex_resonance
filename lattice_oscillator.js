@@ -20,16 +20,20 @@ let checkLinear;
 let linear = true;
 let normalModes = [false, false, false, false];
 let pluck= false;
+let pluc_loc = 0;
+let pluck_force = 1;
+let pluck_i = 0;
 
 
 
 class Phonon {
-    timestep = 0.1;
+    timestep = 0.3;
     radius = 2;
     c = 0.00;
     mass = 1.0;
     x = 0;
     v = 0;
+    additional_force = 0;
  
 
     constructor(x, v, k, zeta) {
@@ -44,34 +48,48 @@ class Phonon {
         this.c = zeta * 2 * sqrt(this.mass * this.k);
     }
 
-    updateForce(left_obj, right_obj){
+    updateForce(neighbors){
         if(linear){
-            this.updateForceLinear(left_obj, right_obj);
+            this.updateForceLinear(neighbors);
         }else{
-            this.updateForceNonlinear(left_obj, right_obj);
+            this.updateForceNonlinear(neighbors);
         }
     }
 
-    updateForceLinear(left_obj, right_obj) {
+    springForce(){
+        return this.k*this.x;
+    }
+
+    updateForceLinear(neighbors) {
         // Linear coupling
-        // F1  k(-2*x1 + x2 + x0), x0 = 0
-        // F2  k(-2*x2 + x1 + x3), x3 = 0
-        this.force = -2.0 * this.k * this.x + left_obj.k * left_obj.x + right_obj.k * right_obj.x;
+        // F = k(-2*x1 + x2 + x0)
+
+        let f = 0;
+ 
+        for(let i = 0; i < 2; i++){
+            f += neighbors[i].springForce();
+        }
+        f += -1*neighbors.length * this.springForce();
+        f -= this.c*this.v;
+        f += this.additional_force;
+        this.force = f;
 
     }
 
-    updateForceNonlinear(left_obj, right_obj) {
+    updateForceNonlinear(neighbors) {
         // FPUT (Fermi Pasta Ulam Tsingou) non-linear oscillator
-
-        alpha = 0.9;
-        this.force = (-2.0 * this.k * this.x + left_obj.k * left_obj.x + right_obj.k * right_obj.x) * (1 + alpha * (left_obj.x - right_obj.x));
-
+        // ONLY WORKS IN 1-D!
+        this.updateForceLinear(neighbors) 
+        let alpha = 0.9;
+        let nlForce = 1 + alpha * (neighbors[0].x - neighbors[1].x);
+        this.force *= nlForce;
     }
 
     updatePosition() {
         let a = this.force / this.mass;
         this.v += a * this.timestep;
         this.x += this.v * this.timestep;
+        this.additional_force = 0;
     }
 
     draw(init_x, mult_x, y_loc) {
@@ -94,7 +112,7 @@ function reset() {
 
     objects = [n_objects];
     let k = 0.01*4*kSlider.value();
-    let zeta = 0.01*2*zetaSlider.value();
+    let zeta = 0.0001*zetaSlider.value();
 
     let radius = int(0.8 * width / n_objects);
     if (radius < 2) {
@@ -116,18 +134,18 @@ function reset() {
        }
         
     }
+
     if(pluck){
-        //initialize with triangle 
-        pluck_i = int(0.5*objects.length);
-        pluck_x = 0.3
-        for(i = 0; i < pluck_i ; i++){
-            objects[i].x = pluck_x*i/objects.length;
-        }
+        // pluck_i = 10; // do pluck over n cycles;
+        // pluck_force = 0.01;
+        // pluck_loc = int(0.5*objects.length);
 
-        for(i = 1; i <= objects.length - pluck_i; i++){
-            objects[objects.length - i].x = pluck_x*i/objects.length;
-        }
-
+        pluck_freq = 3.1
+        for (i = 1; i < n_objects - 1; i++) {
+        
+            objects[i].x = 0.4*sin(pluck_freq* PI * i / (n_objects - 1));
+            
+       }
 
     }
 
@@ -152,10 +170,10 @@ function setup() {
 
 
     createDiv('spring constant');
-    kSlider = createSlider(0, 100, 50);
+    kSlider = createSlider(0, 100, 50, 0);
     kSlider.mouseReleased(reset);
     createDiv('damping ratio');
-    zetaSlider = createSlider(0, 100, 10);
+    zetaSlider = createSlider(0, 100, 10, 0);
     zetaSlider.mouseReleased(reset);
     createDiv('n phonons');
     nSlider = createSlider(1,200, 2*3*4*5 - 1);
@@ -163,11 +181,11 @@ function setup() {
     createDiv('');
 
     createDiv('Normal Modes')
-    checkNormal1 = createCheckbox('1', false);
+    checkNormal1 = createCheckbox('1', true);
     checkNormal2 = createCheckbox('2', false);
     checkNormal3 = createCheckbox('3', false);
     checkNormal4 = createCheckbox('4', false);
-    checkPluck = createCheckbox('pluck', true);
+    checkPluck = createCheckbox('pluck', false);
     checkLinear = createCheckbox('Linear', true);
     checkNormal1.changed(reset);
     checkNormal2.changed(reset);
@@ -189,19 +207,31 @@ function setup() {
 function draw() {
 
     // update
-    for (j = 0; j < 20; j++) {
+    for (let j = 0; j < 5; j++) {
 
-        for (i = 1; i < objects.length - 1; i++) {
+        if(pluck_i > 0){
+
+            objects[pluck_loc].additional_force += pluck_force;
+            pluck_i -= 1;
+        }
+
+        for (let i = 1; i < objects.length - 1; i++) {
             left_obj = objects[i - 1];
             //right_obj = objects[n_objects - 1]; //TMPDEBUG: no leftwards communication
             right_obj = objects[i + 1];
-            objects[i].updateForce(left_obj, right_obj);
+        
+            neighbors = Array();
+            neighbors.push(left_obj);
+            neighbors.push(right_obj);
+            objects[i].updateForce([left_obj, right_obj]);
 
         }
 
 
 
-        for (i = 1; i < objects.length - 1; i++) {
+
+
+        for (let i = 1; i < objects.length - 1; i++) {
             objects[i].updatePosition();
         }
 
@@ -244,5 +274,5 @@ function draw() {
     objects[0].draw(x0, xinc, y_loc);
     objects[objects.length - 1].draw(x0 + xwidth, xinc, y_loc);
 
-
+  
 }
